@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+header {
+    width: 100%;
+    background-color: #f8f8f8;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+}
+
+#stopwatches {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.stopwatch {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.stopwatch input {
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 90%;
+}
+
+.stopwatch .buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.stopwatch span {
+    margin-top: 5px;
+}
+
+.target-time,
+.start-time {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin-bottom: 10px;
+}
+
+.target-time input,
+.start-time input {
+    width: 30%;
+}
+
+.controls {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 10px;
+    gap: 10px;
+}
+
+.running {
+    text-align: right;
+}
