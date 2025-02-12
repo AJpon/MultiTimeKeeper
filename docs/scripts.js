@@ -65,6 +65,11 @@ function addStopwatch() {
     editButton.addEventListener('click', () => toggleEditFields(nameField, targetTimeField, startTimeField, nameDisplay));
     buttonContainer.appendChild(editButton);
 
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', () => deleteStopwatch(stopwatchContainer));
+    buttonContainer.appendChild(deleteButton);
+
     stopwatchContainer.appendChild(buttonContainer);
     document.getElementById('stopwatches').appendChild(stopwatchContainer);
 
@@ -121,6 +126,10 @@ function resetStopwatch(display, targetTimeField, startTimeField, remainingTimeD
     const remainingTime = targetTime - startTime;
     remainingTimeDisplay.textContent = `Remaining Time: ${formatTime(Math.abs(remainingTime))}`;
     remainingTimeDisplay.style.color = remainingTime < 0 ? 'red' : 'green';
+}
+
+function deleteStopwatch(container) {
+    container.remove();
 }
 
 function formatTime(ms) {
