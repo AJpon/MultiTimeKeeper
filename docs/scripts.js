@@ -50,15 +50,10 @@ function addStopwatch() {
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'buttons';
 
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start';
-    startButton.addEventListener('click', () => startStopwatch(timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay));
-    buttonContainer.appendChild(startButton);
-
-    const stopButton = document.createElement('button');
-    stopButton.textContent = 'Stop';
-    stopButton.addEventListener('click', () => stopStopwatch(timeDisplay));
-    buttonContainer.appendChild(stopButton);
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = 'Start';
+    toggleButton.addEventListener('click', () => toggleStopwatch(toggleButton, timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay));
+    buttonContainer.appendChild(toggleButton);
 
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset';
@@ -74,12 +69,7 @@ function addStopwatch() {
     document.getElementById('stopwatches').appendChild(stopwatchContainer);
 
     // Add直後に開始時間と残り時間を反映
-    const startTime = parseTimeInput(startTimeField.value);
-    const targetTime = parseTimeInput(targetTimeField.value);
-    timeDisplay.textContent = formatTime(startTime);
-    const remainingTime = targetTime - startTime;
-    remainingTimeDisplay.textContent = `Remaining Time: ${formatTime(Math.abs(remainingTime))}`;
-    remainingTimeDisplay.style.color = remainingTime < 0 ? 'red' : 'green';
+    resetStopwatch(timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay);
 }
 
 function toggleEditFields(nameField, targetTimeField, startTimeField, nameDisplay) {
@@ -90,9 +80,19 @@ function toggleEditFields(nameField, targetTimeField, startTimeField, nameDispla
     nameDisplay.textContent = nameField.value;
 }
 
+function toggleStopwatch(button, display, targetTimeField, startTimeField, remainingTimeDisplay) {
+    if (button.textContent === 'Start') {
+        startStopwatch(display, targetTimeField, startTimeField, remainingTimeDisplay);
+        button.textContent = 'Stop';
+    } else {
+        stopStopwatch(display);
+        button.textContent = 'Start';
+    }
+}
+
 function startStopwatch(display, targetTimeField, startTimeField, remainingTimeDisplay) {
     if (display.timer) return;
-    const startTime = parseTimeInput(startTimeField.value);
+    const startTime = display.elapsedTime || parseTimeInput(startTimeField.value);
     display.startTime = Date.now() - startTime;
     display.elapsedTime = startTime;
     display.timer = setInterval(() => {
