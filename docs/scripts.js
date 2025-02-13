@@ -7,6 +7,19 @@ function addStopwatch() {
 
     const stopwatchContainer = document.createElement('div');
     stopwatchContainer.className = 'stopwatch';
+    stopwatchContainer.draggable = true;
+    stopwatchContainer.addEventListener('dragstart', handleDragStart);
+    stopwatchContainer.addEventListener('dragover', handleDragOver);
+    stopwatchContainer.addEventListener('drop', handleDrop);
+    stopwatchContainer.addEventListener('dragend', handleDragEnd);
+
+    const knob = document.createElement('div');
+    knob.className = 'knob';
+    for (let i = 0; i < 3; i++) {
+        const bar = document.createElement('div');
+        knob.appendChild(bar);
+    }
+    stopwatchContainer.appendChild(knob);
 
     const nameContainer = document.createElement('div');
     nameContainer.className = 'watchName';
@@ -50,15 +63,10 @@ function addStopwatch() {
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'buttons';
 
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start';
-    startButton.addEventListener('click', () => startStopwatch(timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay));
-    buttonContainer.appendChild(startButton);
-
-    const stopButton = document.createElement('button');
-    stopButton.textContent = 'Stop';
-    stopButton.addEventListener('click', () => stopStopwatch(timeDisplay));
-    buttonContainer.appendChild(stopButton);
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = 'Start';
+    toggleButton.addEventListener('click', () => toggleStopwatch(toggleButton, timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay));
+    buttonContainer.appendChild(toggleButton);
 
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset';
@@ -70,16 +78,16 @@ function addStopwatch() {
     editButton.addEventListener('click', () => toggleEditFields(nameField, targetTimeField, startTimeField, nameDisplay));
     buttonContainer.appendChild(editButton);
 
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', () => deleteStopwatch(stopwatchContainer));
+    buttonContainer.appendChild(deleteButton);
+
     stopwatchContainer.appendChild(buttonContainer);
     document.getElementById('stopwatches').appendChild(stopwatchContainer);
 
     // Add直後に開始時間と残り時間を反映
-    const startTime = parseTimeInput(startTimeField.value);
-    const targetTime = parseTimeInput(targetTimeField.value);
-    timeDisplay.textContent = formatTime(startTime);
-    const remainingTime = targetTime - startTime;
-    remainingTimeDisplay.textContent = `Remaining Time: ${formatTime(Math.abs(remainingTime))}`;
-    remainingTimeDisplay.style.color = remainingTime < 0 ? 'red' : 'green';
+    resetStopwatch(timeDisplay, targetTimeField, startTimeField, remainingTimeDisplay);
 }
 
 function toggleEditFields(nameField, targetTimeField, startTimeField, nameDisplay) {
@@ -90,9 +98,19 @@ function toggleEditFields(nameField, targetTimeField, startTimeField, nameDispla
     nameDisplay.textContent = nameField.value;
 }
 
+function toggleStopwatch(button, display, targetTimeField, startTimeField, remainingTimeDisplay) {
+    if (button.textContent === 'Start') {
+        startStopwatch(display, targetTimeField, startTimeField, remainingTimeDisplay);
+        button.textContent = 'Stop';
+    } else {
+        stopStopwatch(display);
+        button.textContent = 'Start';
+    }
+}
+
 function startStopwatch(display, targetTimeField, startTimeField, remainingTimeDisplay) {
     if (display.timer) return;
-    const startTime = parseTimeInput(startTimeField.value);
+    const startTime = display.elapsedTime || parseTimeInput(startTimeField.value);
     display.startTime = Date.now() - startTime;
     display.elapsedTime = startTime;
     display.timer = setInterval(() => {
@@ -121,6 +139,49 @@ function resetStopwatch(display, targetTimeField, startTimeField, remainingTimeD
     const remainingTime = targetTime - startTime;
     remainingTimeDisplay.textContent = `Remaining Time: ${formatTime(Math.abs(remainingTime))}`;
     remainingTimeDisplay.style.color = remainingTime < 0 ? 'red' : 'green';
+}
+
+function deleteStopwatch(container) {
+    container.remove();
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.dataTransfer.setDragImage(e.target, 20, 20);
+    e.target.classList.add('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement && e.target.closest('.stopwatch') && e.target.closest('.stopwatch') !== draggingElement) {
+        const stopwatches = document.getElementById('stopwatches');
+        const targetElement = e.target.closest('.stopwatch');
+        const bounding = targetElement.getBoundingClientRect();
+        const offset = bounding.y + (bounding.height / 2);
+        if (e.clientY - offset > 0) {
+            stopwatches.insertBefore(draggingElement, targetElement.nextSibling);
+        } else {
+            stopwatches.insertBefore(draggingElement, targetElement);
+        }
+    }
+}
+
+function handleDrop(e) {
+    e.stopPropagation();
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement) {
+        draggingElement.classList.remove('dragging');
+    }
+}
+
+function handleDragEnd(e) {
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement) {
+        draggingElement.classList.remove('dragging');
+    }
 }
 
 function formatTime(ms) {
