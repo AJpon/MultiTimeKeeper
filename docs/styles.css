@@ -41,6 +41,7 @@ main {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    position: relative;
 }
 
 .stopwatch input {
@@ -82,4 +83,32 @@ main {
 
 .running {
     text-align: right;
+}
+
+.knob {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}
+
+.knob div {
+    width: 100%;
+    height: 3px;
+    background-color: #ccc;
+}
+
+.dragging {
+    opacity: 0.5;
+}
+
+.stopwatch.drag-over {
+    border: 2px dashed #000;
 }

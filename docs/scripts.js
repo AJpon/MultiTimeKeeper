@@ -7,6 +7,19 @@ function addStopwatch() {
 
     const stopwatchContainer = document.createElement('div');
     stopwatchContainer.className = 'stopwatch';
+    stopwatchContainer.draggable = true;
+    stopwatchContainer.addEventListener('dragstart', handleDragStart);
+    stopwatchContainer.addEventListener('dragover', handleDragOver);
+    stopwatchContainer.addEventListener('drop', handleDrop);
+    stopwatchContainer.addEventListener('dragend', handleDragEnd);
+
+    const knob = document.createElement('div');
+    knob.className = 'knob';
+    for (let i = 0; i < 3; i++) {
+        const bar = document.createElement('div');
+        knob.appendChild(bar);
+    }
+    stopwatchContainer.appendChild(knob);
 
     const nameContainer = document.createElement('div');
     nameContainer.className = 'watchName';
@@ -130,6 +143,45 @@ function resetStopwatch(display, targetTimeField, startTimeField, remainingTimeD
 
 function deleteStopwatch(container) {
     container.remove();
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.dataTransfer.setDragImage(e.target, 20, 20);
+    e.target.classList.add('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement && e.target.closest('.stopwatch') && e.target.closest('.stopwatch') !== draggingElement) {
+        const stopwatches = document.getElementById('stopwatches');
+        const targetElement = e.target.closest('.stopwatch');
+        const bounding = targetElement.getBoundingClientRect();
+        const offset = bounding.y + (bounding.height / 2);
+        if (e.clientY - offset > 0) {
+            stopwatches.insertBefore(draggingElement, targetElement.nextSibling);
+        } else {
+            stopwatches.insertBefore(draggingElement, targetElement);
+        }
+    }
+}
+
+function handleDrop(e) {
+    e.stopPropagation();
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement) {
+        draggingElement.classList.remove('dragging');
+    }
+}
+
+function handleDragEnd(e) {
+    const draggingElement = document.querySelector('.dragging');
+    if (draggingElement) {
+        draggingElement.classList.remove('dragging');
+    }
 }
 
 function formatTime(ms) {
